@@ -55,3 +55,15 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Log ignores
+logs/
+
+# OSX ignores
+.DS_Store
+
+# IDE ignores
+.idea/
+
+# Project specific ignores
+secrets.py
