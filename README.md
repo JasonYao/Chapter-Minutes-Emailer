@@ -22,9 +22,9 @@ python3 Emailer.py
 ```
 
 ## To automate this with a `cron` job
-Setup a cronjob where the `cron` daemon will run a box-specific version of [run.sh](run.sh).
-
-TODO Add cron job setup instructions
+Setup a cronjob where the `cron` daemon will run a box-specific version of [run.sh](run.sh). 
+An example script is the [time.sh](time.sh) script, which should only be run once, and will
+add the job to be run once a week at saturday morning at 12:30am.
 
 ## License
 This repo is distributed under the GNU GPL v2 license. A copy of that license may be found [here](LICENSE)
