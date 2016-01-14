@@ -55,7 +55,9 @@ def get_parent_id(log_file, date):
                                                    " the drive folder, then let the Omega know in order to re-run " \
                                                    "this program"
         recipients = [secrets.omega_email, secrets.sigma_email]
-        shit_done_fucked_up_now(message, recipients)
+        subject = "[Phi Kappa Sigma] [Chapter Minutes Emailer] Shit is burning, halp"
+        email(recipients, subject, message)
+        log_file.close()
         exit(1)
 
     # Uses the file id to find the parent directory id
@@ -74,7 +76,9 @@ def get_parent_id(log_file, date):
                                                    " figure out why this is so."
 
         recipients = [secrets.omega_email]
-        shit_done_fucked_up_now(message, recipients)
+        subject = "[Phi Kappa Sigma] [Chapter Minutes Emailer] Shit is burning, halp"
+        email(recipients, subject, message)
+        log_file.close()
         exit(1)
 
     # Logs the relevant meta information
@@ -83,18 +87,26 @@ def get_parent_id(log_file, date):
     return parent_id, grep_output_list[1].decode()
 
 
-def email_users(parent_id, file_name, log_file):
-    directory_url = "https://drive.google.com/drive/folders/" + parent_id
-
-    # Send the email to all users
+def email(recipients, subject, message):
     requests.post(
         "https://api.mailgun.net/v3/skullhouse.nyc/messages",
         auth=("api", secrets.api_key),
-        data={"from": "Sammy B <SammyB@skullhouse.nyc>",
-              "to": secrets.users,
-              "subject": "[Phi Kappa Sigma] [Chapter Minutes] " + file_name[:-4],
-              "text": "Officers: Please add in your reports for tomorrow's Chapter here: " + directory_url +
-                      ".\n All members: Please read through these reports in preparation for chapter tomorrow."})
+        data={"from": "Samuel Brown Wylie Mitchell <Samuel@skullhouse.nyc>",
+              "to": recipients,
+              "subject": subject,
+              "text": message,
+              })
+    return
+
+
+def email_users(parent_id, file_name, log_file):
+    directory_url = "https://drive.google.com/drive/folders/" + parent_id
+    message = "Officers: Please add in your reports for tomorrow's Chapter here: " + directory_url + \
+              ".\n All members: Please read through these reports in preparation for chapter tomorrow."
+
+    # Send the email to all users
+    subject = "[Phi Kappa Sigma] [Chapter Minutes] " + file_name[:-4]
+    email(secrets.users, subject, message)
 
     # Logs the email sending completion
     log_file.write("All members emailed (" + str(len(secrets.users)) + " users)\n")
@@ -107,17 +119,6 @@ def main():
     parent_id, file_name = get_parent_id(log_file, date)
     email_users(parent_id, file_name, log_file)
     log_file.close()
-
-
-def shit_done_fucked_up_now(message, recipients):
-    requests.post(
-        "https://api.mailgun.net/v3/skullhouse.nyc/messages",
-        auth=("api", secrets.api_key),
-        data={"from": "Sammy B <SammyB@skullhouse.nyc>",
-              "to": recipients,
-              "subject": "[Phi Kappa Sigma] [Chapter Minutes Emailer] Shit is burning, halp",
-              "text": message})
-    return
 
 
 # Standard boilerplate to call the main() function to begin the program.
