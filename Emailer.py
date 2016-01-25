@@ -34,8 +34,8 @@ def get_parent_id(log_file, date):
 
     # Builds the bash commands required to go through them all
     drive_command = ["drive", "list"]
-    grep_command = ["grep", chapter_minutes_filename]
-    # grep_command = ["grep", "3-30-14_Minutes.doc"]  # TODO remove after: a fake containing an actual file on drive
+    #grep_command = ["grep", chapter_minutes_filename]
+    grep_command = ["grep", "3-30-14_Minutes.doc"]  # TODO remove after: a fake containing an actual file on drive
 
     try:
         # Checks to see if the file is on the drive
@@ -51,12 +51,14 @@ def get_parent_id(log_file, date):
     except subprocess.CalledProcessError:
         # The file has not been created yet, notifies the relevant parties
         log_file.write("Error: Unable to locate the file, emailing omega for help\n")
-        message = "The file " + file_id.decode() + " could not be found on drive. Sigma, please add the document to" \
-                                                   " the drive folder, then let the Omega know in order to re-run " \
-                                                   "this program"
-        recipients = [secrets.omega_email, secrets.sigma_email]
+        message = "The file " + chapter_minutes_filename + " could not be found on drive. " \
+                                                           "Sigma, please add the document to the drive folder," \
+                                                           " then let the Omega know in order to re-run this program."
+        recipients = secrets.omega_email
         subject = "[Phi Kappa Sigma] [Chapter Minutes Emailer] Shit is burning, halp"
-        email(recipients, subject, message)
+        cc = secrets.sigma_email
+        bcc = ""
+        email(recipients, subject, message, cc, bcc)
         log_file.close()
         exit(1)
 
@@ -75,9 +77,11 @@ def get_parent_id(log_file, date):
         message = "The file " + file_id.decode() + "'s parent directory ID could not be found on drive. Omega, please" \
                                                    " figure out why this is so."
 
-        recipients = [secrets.omega_email]
+        recipients = secrets.omega_email
         subject = "[Phi Kappa Sigma] [Chapter Minutes Emailer] Shit is burning, halp"
-        email(recipients, subject, message)
+        cc = ""
+        bcc = ""
+        email(recipients, subject, message, cc, bcc)
         log_file.close()
         exit(1)
 
@@ -87,11 +91,13 @@ def get_parent_id(log_file, date):
     return parent_id, grep_output_list[1].decode()
 
 
-def email(recipients, subject, message):
+def email(recipients, subject, message, cc, bcc):
     requests.post(
         "https://api.mailgun.net/v3/skullhouse.nyc/messages",
         auth=("api", secrets.api_key),
         data={"from": "Samuel Brown Wylie Mitchell <Samuel@skullhouse.nyc>",
+              "cc": cc,
+              "bcc": bcc,
               "to": recipients,
               "subject": subject,
               "text": message,
@@ -106,7 +112,8 @@ def email_users(parent_id, file_name, log_file):
 
     # Send the email to all users
     subject = "[Phi Kappa Sigma] [Chapter Minutes] " + file_name[:-4]
-    email(secrets.users, subject, message)
+    cc = ""
+    email(secrets.omega_email, subject, message, cc, secrets.users)
 
     # Logs the email sending completion
     log_file.write("All members emailed (" + str(len(secrets.users)) + " users)\n")
