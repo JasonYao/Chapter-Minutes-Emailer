@@ -34,8 +34,11 @@ def get_parent_id(log_file, date):
 
     # Builds the bash commands required to go through them all
     drive_command = ["drive", "list"]
-    grep_command = ["grep", chapter_minutes_filename]
-    #grep_command = ["grep", "3-30-14_Minutes.doc"]  # TODO remove after: a fake containing an actual file on drive
+
+    if secrets.is_debug_mode:
+        grep_command = ["grep", chapter_minutes_filename]
+    else:
+        grep_command = ["grep", "3-30-14_Minutes.doc"]  # A known fake document on google drive
 
     try:
         # Checks to see if the file is on the drive
