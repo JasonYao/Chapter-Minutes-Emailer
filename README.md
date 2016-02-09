@@ -15,6 +15,19 @@ The second dependency is python 3.5.x, and then installing the [requests](http:/
 pip3 install requests
 ```
 
+## Setup
+This program uses a configuration file called (secrets.py)[secrets.py.example], which follows the mantra of "config once, run every time".
+
+Specifically on a clean install upon a PKS server, you'll need to do a few steps:
+
+0.) Copy the mailgun API secret key, and paste it into where `key-yourApiKeyHere`. This can be found on the dashboard to mailgun.com.
+
+1.) [ONLY IN PRODUCTION] Set `is_debug_mode` to `False` after testing functionality.
+
+2.) Copy the brotherhood mailing list in the users array, making sure that everything is comma-deliminated as in the example.
+
+3.) In mailgun.com's routing, make sure that omega & sigma plus addressing forwards to the correct mailbox.
+
 ## Running commands
 ```sh
 # If you use a virtualenv (you should), activate it now
